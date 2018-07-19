@@ -10,15 +10,11 @@ import (
 // from the tree to the channel ch.
 func Walk(t *tree.Tree, ch chan int) {
 	if t == nil {
-		fmt.Println("t nil")
 		return
 	}
 
-	fmt.Println("Walk called Left")
 	Walk(t.Left, ch)
-	fmt.Println("value:", t.Value)
 	ch <- t.Value
-	fmt.Println("Walk called Right")
 	Walk(t.Right, ch)
 }
 
@@ -37,25 +33,18 @@ func Same(t1, t2 *tree.Tree) bool {
 		close(t2c)
 	}()
 
-	same := true
-	ctr := 0
 	for t1v := range t1c {
-		ctr = ctr + 1
-		if ctr == 100 {
-			fmt.Println("aaaaahhhhhhhh")
+		t2v := <-t2c
+		if t1v != t2v {
 			return false
 		}
-		//t1v := <-t1c
-		t2v := <-t2c
-		fmt.Println("comparing:", t1v, t2v)
-		if t1v != t2v {
-			same = false
-		}
 	}
-	return same
+	return true
 }
 
 func main() {
 	same := Same(tree.New(1), tree.New(1))
-	fmt.Println("same:", same)
+	fmt.Println("same (should be true):", same)
+	same = Same(tree.New(1), tree.New(2))
+	fmt.Println("same (should be false):", same)
 }
